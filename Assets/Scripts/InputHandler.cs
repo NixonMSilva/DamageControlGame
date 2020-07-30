@@ -5,8 +5,11 @@ using UnityEngine;
 public class InputHandler : MonoBehaviour
 {
     public CharacterController2D cc;
+    public PlayerHandler ph;
 
     float horizontalMove = 0f;
+
+    bool isJumping = false;
 
     // Start is called before the first frame update
     void Start()
@@ -18,12 +21,40 @@ public class InputHandler : MonoBehaviour
     void Update ()
     {
         horizontalMove = Input.GetAxisRaw("Horizontal") * Defines.DEFAULTSPEED;
+
+        // Jump Handler
+        if (Input.GetButtonDown("Jump"))
+        {
+            isJumping = true;
+        }
+
+        // Umbrella Handler
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ph.ActivateUmbrella();
+        }
+        else if (Input.GetKeyUp(KeyCode.F))
+        {
+            ph.DeactivateUmbrella();
+        }
+
+        // Extinguisher Handler
+        if (Input.GetKey(KeyCode.G))
+        {
+            Debug.Log("key is pressed!");
+            ph.StartExtinguisher();
+        }
+        else
+        {
+            ph.StopExtinguisher();
+        }
     }
 
     void FixedUpdate ()
     {
-        Debug.Log(horizontalMove);
-        cc.Move(horizontalMove * Time.fixedDeltaTime, false, false);
+        // Debug.Log(horizontalMove);
+        cc.Move(horizontalMove * Time.fixedDeltaTime, false, isJumping);
+        isJumping = false;
 
     }
 }

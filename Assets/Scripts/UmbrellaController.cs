@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExitController : MonoBehaviour
+public class UmbrellaController : MonoBehaviour
 {
-
-    public LayerMask npcLayers;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -19,12 +16,12 @@ public class ExitController : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter2D (Collision2D collision)
+    void OnTriggerEnter2D (Collider2D col)
     {
-        if (collision.gameObject.layer.Equals(10)) // NPC Layer
+        if (col.gameObject.layer.Equals(12)) // Rock layer
         {
-            collision.gameObject.GetComponent<NPCController>().ExitMap();
+            Debug.Log("rock!");
+            col.gameObject.GetComponent<RockController>().DestroyRock();
         }
-        
     }
 }

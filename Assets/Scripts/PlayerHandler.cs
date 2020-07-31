@@ -19,6 +19,9 @@ public class PlayerHandler : MonoBehaviour
     bool isUsingUmbrella = false;
     bool isUsingExtinguisher = false;
 
+    bool isDamagingPlayer = false;
+    bool isPickingExtinguisher = false;
+
     float extinguisherFuel = 0;
     float umbrellaCharge = 100f;
 
@@ -43,6 +46,22 @@ public class PlayerHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isDamagingPlayer)
+        {
+            DamagePlayer(25f);
+            isDamagingPlayer = false;
+        }
+
+        if (isPickingExtinguisher)
+        {
+            extinguisherFuel += 100f;
+            if (extinguisherFuel > 100f)
+            {
+                extinguisherFuel = 100f;
+            }
+            extinguisherBar.SetSliderValue(extinguisherFuel);
+        }
+
         if (health <= 0)
             DiePlayer();
         
@@ -58,6 +77,7 @@ public class PlayerHandler : MonoBehaviour
                 umbrellaBar.SetSliderValue(umbrellaCharge);
             }
         }
+
         Debug.Log("Umbrella Charge: " + umbrellaCharge);
     }
 
@@ -127,19 +147,18 @@ public class PlayerHandler : MonoBehaviour
     {
         if (col.gameObject.layer.Equals(12)) // Rock layer
         {
-            if (!isUsingUmbrella)       // Damages player if he's not using an umbrella
-                DamagePlayer(50f);
+            if (!isUsingUmbrella)
+            {
+                Destroy(col.gameObject);
+                isDamagingPlayer = true;
+                // Damages player if he's not using an umbrella
+            }
         }
 
         if (col.gameObject.layer.Equals(14)) // Extinguisher layer
         {
             Destroy(col.gameObject);
-            extinguisherFuel += 100f;
-            if (extinguisherFuel > 100f)
-            {
-                extinguisherFuel = 100f;
-            }
-            extinguisherBar.SetSliderValue(extinguisherFuel);
+            isPickingExtinguisher = true;
             // Debug.Log("After:" + extinguisherFuel);
         }
     }

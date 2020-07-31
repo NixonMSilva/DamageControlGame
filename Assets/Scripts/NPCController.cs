@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,14 +14,25 @@ public class NPCController : MonoBehaviour
     public GameObject nearestExist;
     public GameObject blockingFire;                                         // The fire that blocks this NPC from running away
 
+    public GameObject scoreObject;
+    ScoreController scoreController;
+
     public MovementController mc;
     public Rigidbody2D rb;
     public BoxCollider2D bc;
 
     private bool onGround = false;
+
+    private bool hasLeftMap = false;
     
     private void Awake ()
     {
+        scoreObject = GameObject.FindGameObjectWithTag("ScoreObj");
+        if (scoreObject != null)
+        {
+            scoreController = scoreObject.GetComponent<ScoreController>();
+        }
+        Debug.Log(scoreObject.ToString());
         health = maxHealth;
     }
 
@@ -42,8 +54,7 @@ public class NPCController : MonoBehaviour
 
     void SeekExit ()
     {
-        
-        if (onGround)
+        if (isTrapped && onGround)
         {
             // Debug.Log(this.gameObject.name + "Seeking exit");
             Vector2 exitSeekingTranslation = nearestExist.transform.position - gameObject.transform.position;
@@ -70,6 +81,11 @@ public class NPCController : MonoBehaviour
 
     void ExitMap ()
     {
+        if (!hasLeftMap)
+        {
+            scoreController.AddToScore(100);
+            hasLeftMap = true;
+        }
         Destroy(this.gameObject, 0.25f);
     }
 
@@ -88,7 +104,7 @@ public class NPCController : MonoBehaviour
         }
         else if (col.gameObject.layer.Equals(12)) // Rock layer
         {
-            Debug.Log("rock!");
+            // Debug.Log("rock!");
             DealDamage(50f);
         }
         

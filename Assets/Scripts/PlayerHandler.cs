@@ -16,17 +16,21 @@ public class PlayerHandler : MonoBehaviour
     public BarController umbrellaBar;
     public BarController extinguisherBar;
 
+    public GameObject scoreObject;
+    ScoreController scoreController;
+
     bool isUsingUmbrella = false;
     bool isUsingExtinguisher = false;
 
     bool isDamagingPlayer = false;
     bool isPickingExtinguisher = false;
 
+    bool isDestroyingRock = false;
+
     float extinguisherFuel = 0;
     float umbrellaCharge = 100f;
 
     // public int remainingTime = 60;
-    int score = 0;
     
 
     void Awake ()
@@ -35,6 +39,8 @@ public class PlayerHandler : MonoBehaviour
         healthBar.SetSliderValue(health);
         umbrellaBar.SetSliderValue(umbrellaCharge);
         extinguisherBar.SetSliderValue(extinguisherFuel);
+        scoreController = scoreObject.GetComponent<ScoreController>();
+        
     }
 
     // Start is called before the first frame update
@@ -62,6 +68,12 @@ public class PlayerHandler : MonoBehaviour
             extinguisherBar.SetSliderValue(extinguisherFuel);
         }
 
+        if (isDestroyingRock)
+        {
+            isDestroyingRock = false;
+            scoreController.AddToScore(50);
+        }
+
         if (health <= 0)
             DiePlayer();
         
@@ -78,7 +90,7 @@ public class PlayerHandler : MonoBehaviour
             }
         }
 
-        Debug.Log("Umbrella Charge: " + umbrellaCharge);
+        // Debug.Log("Umbrella Charge: " + umbrellaCharge);
     }
 
     public void ActivateUmbrella ()
@@ -153,6 +165,10 @@ public class PlayerHandler : MonoBehaviour
                 isDamagingPlayer = true;
                 // Damages player if he's not using an umbrella
             }
+            else
+            {
+                isDestroyingRock = true;
+            }
         }
 
         if (col.gameObject.layer.Equals(14)) // Extinguisher layer
@@ -176,7 +192,7 @@ public class PlayerHandler : MonoBehaviour
                 {
                     col.gameObject.GetComponent<FireController>().DescreaseFire(10f);
                 }
-                Debug.Log("Object: " + thing.gameObject.name);
+                // Debug.Log("Object: " + thing.gameObject.name);
             }
         }
     }

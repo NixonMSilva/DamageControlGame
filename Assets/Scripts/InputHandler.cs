@@ -29,11 +29,11 @@ public class InputHandler : MonoBehaviour
         }
 
         // Umbrella Handler
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKey(KeyCode.F))
         {
             ph.ActivateUmbrella();
         }
-        else if (Input.GetKeyUp(KeyCode.F))
+        else
         {
             ph.DeactivateUmbrella();
         }

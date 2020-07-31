@@ -6,20 +6,32 @@ using UnityEngine;
 public class PlayerHandler : MonoBehaviour
 {
 
-    public float maxHealth = 50f;
+    public float maxHealth = 100f;
     public float health;
 
     public GameObject umbrella;
     public GameObject extinguisherSmoke;
 
+    public BarController healthBar;
+    public BarController umbrellaBar;
+    public BarController extinguisherBar;
+
     bool isUsingUmbrella = false;
     bool isUsingExtinguisher = false;
 
     float extinguisherFuel = 0;
+    float umbrellaCharge = 100f;
+
+    // public int remainingTime = 60;
+    int score = 0;
+    
 
     void Awake ()
     {
-        health = maxHealth;    
+        health = maxHealth;
+        healthBar.SetSliderValue(health);
+        umbrellaBar.SetSliderValue(umbrellaCharge);
+        extinguisherBar.SetSliderValue(extinguisherFuel);
     }
 
     // Start is called before the first frame update
@@ -33,21 +45,44 @@ public class PlayerHandler : MonoBehaviour
     {
         if (health <= 0)
             DiePlayer();
+        
+        if (!isUsingUmbrella)
+        {
+            if (umbrellaCharge > 100f)
+            {
+                umbrellaCharge = 100f;
+            }
+            else
+            {
+                umbrellaCharge++;
+                umbrellaBar.SetSliderValue(umbrellaCharge);
+            }
+        }
+        Debug.Log("Umbrella Charge: " + umbrellaCharge);
     }
 
     public void ActivateUmbrella ()
     {
-        if (!isUsingUmbrella)
-        {
-            isUsingUmbrella = true;
+        isUsingUmbrella = true;
+        if (umbrellaCharge > 0)
+        {            
+            umbrellaCharge--;
+            umbrellaBar.SetSliderValue(umbrellaCharge);
             umbrella.SetActive(true);
         }
-        
+        else
+        {
+            umbrella.SetActive(false);
+        }
+
     }
 
     public void DeactivateUmbrella ()
     {
-        isUsingUmbrella = false;
+        if (isUsingUmbrella)
+        {
+            isUsingUmbrella = false;
+        }
         umbrella.SetActive(false);
     }
 
@@ -57,13 +92,14 @@ public class PlayerHandler : MonoBehaviour
         isUsingExtinguisher = true;
         if (extinguisherFuel > 0f)
         {
-            extinguisherFuel -= 2;
+            extinguisherFuel -= 1.5f;
+            extinguisherBar.SetSliderValue(extinguisherFuel);
             extinguisherSmoke.SetActive(true);
             // Debug.Log(extinguisherFuel);
         }
         else
         {
-            Debug.Log("No fuel!");
+            // Debug.Log("No fuel!");
         }
     }
 
@@ -79,6 +115,7 @@ public class PlayerHandler : MonoBehaviour
     void DamagePlayer (float damage)
     {
         health -= damage;
+        healthBar.SetSliderValue(health);
     }
 
     void DiePlayer ()
@@ -98,6 +135,11 @@ public class PlayerHandler : MonoBehaviour
         {
             Destroy(col.gameObject);
             extinguisherFuel += 100f;
+            if (extinguisherFuel > 100f)
+            {
+                extinguisherFuel = 100f;
+            }
+            extinguisherBar.SetSliderValue(extinguisherFuel);
             // Debug.Log("After:" + extinguisherFuel);
         }
     }

@@ -7,7 +7,7 @@ using UnityEngine;
 public class NPCController : MonoBehaviour
 {                                                      
     [SerializeField] private float maxHealth = 20f;                         // Amount of maximum health an NPC has
-    [SerializeField] private bool isTrapped = true;                         // Conditional check if the NPC can run to an exit straight away
+    [SerializeField] private bool isTrapped = false;                         // Conditional check if the NPC can run to an exit straight away
     
     public LayerMask groundMask;
     public float health;                                                    // Amount of health an NPC has
@@ -40,35 +40,36 @@ public class NPCController : MonoBehaviour
         health = maxHealth;
         audioManagerObject = GameObject.Find("AudioManager");
         audioManager = audioManagerObject.GetComponent<AudioManager>();
+        
+    }
+
+    void Start ()
+    {
+        // Ignore collisions between NPCs
+        Physics2D.IgnoreLayerCollision(10, 10);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
         // If the NPC's health reaches 0, then he dies
         if (health <= 0f)
         {
             Die();
         }
 
-        SeekExit();
+        // Check if has a fire in front of the NPC before seeking exit and if the NPC is not in the air and not trapped, seek an exit
+        if (IsGrounded() && !CheckForFires())
+        {
+            SeekExit();
+        }
     }
 
     void SeekExit ()
     {
-        if (IsGrounded())
-        {
-            // Check if there's a fire in front of him before the exit
-            CheckForFires();
-
-            if (!isTrapped)
-            {
-                Vector2 exitSeekingTranslation = nearestExist.transform.position - gameObject.transform.position;
-                mc.PerformMoveNormalized(rb, exitSeekingTranslation, Defines.DEFAULTSPEED * 0.1f);
-            }
-            
-        }
+        Vector2 exitSeekingTranslation = (Vector2) nearestExist.transform.position - (Vector2) gameObject.transform.position;
+        mc.PerformMoveNormalized(rb, exitSeekingTranslation, Defines.DEFAULTSPEED * 0.1f);
     }
 
     bool IsGrounded ()
@@ -79,7 +80,6 @@ public class NPCController : MonoBehaviour
 
     void Die ()
     {
-        
         Destroy(this.gameObject);
     }
 
@@ -105,23 +105,29 @@ public class NPCController : MonoBehaviour
         health -= damage;
     }
 
-    void CheckForFires ()
+    bool CheckForFires ()
     {
-        if(nearestExist != null)
+        if (nearestExist != null)
         {
             RaycastHit2D rc = Physics2D.Raycast(gameObject.transform.position, nearestExist.transform.position - gameObject.transform.position, 2f, fireMask);
             if (rc)
             {
-                if (Vector3.Distance(gameObject.transform.position, nearestExist.transform.position) > Vector3.Distance(gameObject.transform.position, rc.collider.transform.position))
-                    isTrapped = true;
+                if (Vector3.Distance(transform.position, nearestExist.transform.position) > Vector3.Distance(transform.position, rc.collider.transform.position))
+                {
+                    // Debug.Log("Distance to the nearest exit: " + Vector3.Distance(transform.position, nearestExist.transform.position) + "\nDistance to the flame: " + Vector3.Distance(transform.position, rc.collider.transform.position));
+                    return true;
+                }
                 else
-                    isTrapped = false;
+                {
+                    return false;
+                }
             }
             else
             {
-                isTrapped = false;
+                return false;
             }
         }
+        return true;
     }
 
     void OnTriggerEnter2D (Collider2D col)

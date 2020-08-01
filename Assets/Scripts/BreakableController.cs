@@ -67,7 +67,8 @@ public class BreakableController : MonoBehaviour
                 anim.SetBool("isBroken", true);
                 audioManager.PlaySound("Destruction");
                 breakingAgent = collision.gameObject;
-            }    
+            }
+            collision.gameObject.GetComponent<RockController>().DestroyRock();
         }
     }
 }

@@ -13,6 +13,8 @@ public class RockController : MonoBehaviour
 
     public Rigidbody2D rb;
 
+    public GameObject ball;
+
     public float y_speed = 2f;
     public float tweenStrength = 2f;
 
@@ -51,6 +53,7 @@ public class RockController : MonoBehaviour
 
     public void DestroyRock ()
     {
+        Instantiate(ball, transform.position, Quaternion.identity);
         Destroy(this.gameObject);
     }
 }

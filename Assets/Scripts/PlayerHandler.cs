@@ -64,7 +64,7 @@ public class PlayerHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -221,12 +221,13 @@ public class PlayerHandler : MonoBehaviour
         {
             if (!isUsingUmbrella)
             {
-                Destroy(col.gameObject);
+                col.GetComponent<RockController>().DestroyRock();
                 isDamagingPlayer = true;
                 // Damages player if he's not using an umbrella
             }
             else
             {
+                col.GetComponent<RockController>().DestroyRock();
                 isDestroyingRock = true;
             }
         }

@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 2979405604386861373}
+  ball: {fileID: 67668685513116697, guid: 645e6fea5aa8cb74b967aa800dd3e046, type: 3}
   y_speed: 2
   tweenStrength: 2
 --- !u!50 &2979405604386861373

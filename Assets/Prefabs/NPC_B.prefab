@@ -103,7 +103,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: dbe7ad033ba976e4593510c27968274a, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -174,6 +174,7 @@ MonoBehaviour:
   mc: {fileID: 2756516035767068490}
   rb: {fileID: 2756516035767068494}
   bc: {fileID: 2756516035767068488}
+  audioManagerObject: {fileID: 0}
   fireMask:
     serializedVersion: 2
     m_Bits: 32768

@@ -49,6 +49,7 @@ public class ScoreController : MonoBehaviour
 
     public void ShowPopup (Vector3 origin, int value, Color color)
     {
+        Transform popupTransform = gameObject.transform;
         GameObject newPopup = Instantiate(popupTemplate, gameObject.transform);
         newPopup.transform.position = origin;
         newPopup.GetComponent<PopupController>().SetText(value.ToString(), color);

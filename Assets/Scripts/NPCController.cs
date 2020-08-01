@@ -27,8 +27,6 @@ public class NPCController : MonoBehaviour
 
     public LayerMask fireMask;
 
-    private bool onGround = false;
-
     private bool hasLeftMap = false;
     private bool hasDied = false;
     
@@ -59,7 +57,7 @@ public class NPCController : MonoBehaviour
 
     void SeekExit ()
     {
-        if (onGround)
+        if (IsGrounded())
         {
             // Check if there's a fire in front of him before the exit
             CheckForFires();
@@ -70,10 +68,6 @@ public class NPCController : MonoBehaviour
                 mc.PerformMoveNormalized(rb, exitSeekingTranslation, Defines.DEFAULTSPEED * 0.1f);
             }
             
-        }
-        else
-        {
-            onGround = IsGrounded();
         }
     }
 
@@ -115,7 +109,6 @@ public class NPCController : MonoBehaviour
     {
         if(nearestExist != null)
         {
-            // Debug.DrawRay(gameObject.transform.position, nearestExist.transform.position - gameObject.transform.position, Color.magenta);
             RaycastHit2D rc = Physics2D.Raycast(gameObject.transform.position, nearestExist.transform.position - gameObject.transform.position, 2f, fireMask);
             if (rc)
             {

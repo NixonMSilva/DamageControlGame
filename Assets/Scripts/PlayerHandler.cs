@@ -23,6 +23,8 @@ public class PlayerHandler : MonoBehaviour
 
     public GameObject audioManagerObject;
 
+    public GameObject keyR;
+
     AudioManager audioManager;
 
     ScoreController scoreController;
@@ -115,6 +117,8 @@ public class PlayerHandler : MonoBehaviour
             }
         }
 
+        // keyR.SetActive(false);
+
         // Debug.Log("Umbrella Charge: " + umbrellaCharge);
     }
 
@@ -131,6 +135,7 @@ public class PlayerHandler : MonoBehaviour
         else
         {
             anim.SetBool("isCarryingItem", false);
+            umbrellaUp = false;
             audioManager.PlaySound("Umbrella_Down");
             umbrella.SetActive(false);
         }
@@ -169,11 +174,11 @@ public class PlayerHandler : MonoBehaviour
             extinguisherBar.SetSliderValue(extinguisherFuel);
             anim.SetBool("isCarryingItem", true);
             extinguisherSmoke.SetActive(true);
-            // Debug.Log(extinguisherFuel);
+            audioManager.PlaySound("Extinguisher");
         }
         else
         {
-            // Debug.Log("No fuel!");
+            isUsingExtinguisher = false;    
         }
     }
 
@@ -260,17 +265,34 @@ public class PlayerHandler : MonoBehaviour
 
         if (col.gameObject.layer.Equals(17)) // Repairable layer
         {
+            BreakableController bkc = col.gameObject.GetComponent<BreakableController>();
             // Repair Handler
             if (Input.GetKeyDown(KeyCode.R))
             {
-                BreakableController bkc = col.gameObject.GetComponent<BreakableController>();
                 if (bkc.GetBroken())
                 {
                     bkc.Repair();
+                    keyR.SetActive(false);
                     isRepairingItem = false;
                 }
             }
+
+            if (bkc.isBroken)
+            {
+                // Show Key
+                Vector3 offset = new Vector3(0f, 2f, 0f);
+                keyR.transform.position = col.gameObject.transform.position + offset;
+                keyR.SetActive(true);
+            }
         }
         
+    }
+
+    void OnTriggerExit2D (Collider2D col)
+    {
+        if (col.gameObject.layer.Equals(17)) // Repairable layer
+        {
+            keyR.SetActive(false);
+        }
     }
 }

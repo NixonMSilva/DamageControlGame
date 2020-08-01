@@ -28,7 +28,6 @@ public class TimeController : MonoBehaviour
         else
         {
             EndGame();
-            Debug.Log("Time's up!");
         }
     }
 
@@ -38,7 +37,7 @@ public class TimeController : MonoBehaviour
         timerText.text = valueInt.ToString();
     }
 
-    void EndGame ()
+    public void EndGame ()
     {
         Time.timeScale = 0f;
         endGameScreen.SetActive(true);

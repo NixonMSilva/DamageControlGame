@@ -20,7 +20,6 @@ public class UmbrellaController : MonoBehaviour
     {
         if (col.gameObject.layer.Equals(12)) // Rock layer
         {
-            Debug.Log("rock!");
             col.gameObject.GetComponent<RockController>().DestroyRock();
         }
     }

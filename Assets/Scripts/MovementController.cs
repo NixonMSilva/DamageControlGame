@@ -5,7 +5,6 @@ using UnityEngine;
 public class MovementController : MonoBehaviour
 {
 
-
     void Awake ()
     {
         
@@ -26,6 +25,11 @@ public class MovementController : MonoBehaviour
     public void PerformMoveUnadjusted (Rigidbody2D rb, Vector2 movement, float speed)
     {
         rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
+
+        if (movement.x < 0)
+        {
+            Flip(rb);
+        }
     }
 
     public void PerformMoveNormalized (Rigidbody2D rb, Vector2 movement, float speed)
@@ -40,5 +44,12 @@ public class MovementController : MonoBehaviour
         {
             rb.rotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
         }
+    }
+
+    public void Flip (Rigidbody2D rb)
+    {
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        rb.transform.localScale = theScale;
     }
 }

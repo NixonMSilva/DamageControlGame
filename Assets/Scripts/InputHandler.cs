@@ -41,7 +41,6 @@ public class InputHandler : MonoBehaviour
         // Extinguisher Handler
         if (Input.GetKey(KeyCode.G))
         {
-            Debug.Log("key is pressed!");
             ph.StartExtinguisher();
         }
         else
@@ -52,7 +51,6 @@ public class InputHandler : MonoBehaviour
 
     void FixedUpdate ()
     {
-        // Debug.Log(horizontalMove);
         cc.Move(horizontalMove * Time.fixedDeltaTime, false, isJumping);
         isJumping = false;
 

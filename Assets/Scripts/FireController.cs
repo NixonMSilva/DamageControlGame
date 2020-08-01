@@ -31,7 +31,7 @@ public class FireController : MonoBehaviour
         if (isDestroyingFire)
         {
             isDestroyingFire = false;
-            scoreController.AddToScore(75);
+            scoreController.AddToScore(gameObject.transform.position, 75);
         }
     }
 

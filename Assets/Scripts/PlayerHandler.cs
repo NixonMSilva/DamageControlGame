@@ -16,8 +16,19 @@ public class PlayerHandler : MonoBehaviour
     public BarController umbrellaBar;
     public BarController extinguisherBar;
 
+    public Animator anim;
+
     public GameObject scoreObject;
+    public GameObject timeObject;
+
+    public GameObject audioManagerObject;
+
+    AudioManager audioManager;
+
     ScoreController scoreController;
+    TimeController timeController;
+
+    bool umbrellaUp = false;
 
     bool isUsingUmbrella = false;
     bool isUsingExtinguisher = false;
@@ -25,7 +36,11 @@ public class PlayerHandler : MonoBehaviour
     bool isDamagingPlayer = false;
     bool isPickingExtinguisher = false;
 
+    bool isRepairingItem = false;
+
     bool isDestroyingRock = false;
+
+    bool isDead = false;
 
     float extinguisherFuel = 0;
     float umbrellaCharge = 100f;
@@ -40,7 +55,8 @@ public class PlayerHandler : MonoBehaviour
         umbrellaBar.SetSliderValue(umbrellaCharge);
         extinguisherBar.SetSliderValue(extinguisherFuel);
         scoreController = scoreObject.GetComponent<ScoreController>();
-        
+        timeController = timeObject.GetComponent<TimeController>();
+        audioManager = audioManagerObject.GetComponent<AudioManager>();
     }
 
     // Start is called before the first frame update
@@ -55,6 +71,7 @@ public class PlayerHandler : MonoBehaviour
         if (isDamagingPlayer)
         {
             DamagePlayer(25f);
+            audioManager.PlaySound("NPC_Death");
             isDamagingPlayer = false;
         }
 
@@ -65,13 +82,21 @@ public class PlayerHandler : MonoBehaviour
             {
                 extinguisherFuel = 100f;
             }
+            audioManager.PlaySound("Pickup");
             extinguisherBar.SetSliderValue(extinguisherFuel);
+            isPickingExtinguisher = false;
         }
 
         if (isDestroyingRock)
         {
             isDestroyingRock = false;
-            scoreController.AddToScore(50);
+            scoreController.AddToScore(gameObject.transform.position, 50);
+            audioManager.PlaySound("Explosion");
+        }
+
+        if (isRepairingItem)
+        {
+            isRepairingItem = false;
         }
 
         if (health <= 0)
@@ -100,11 +125,20 @@ public class PlayerHandler : MonoBehaviour
         {            
             umbrellaCharge--;
             umbrellaBar.SetSliderValue(umbrellaCharge);
+            anim.SetBool("isCarryingItem", true);
             umbrella.SetActive(true);
         }
         else
         {
+            anim.SetBool("isCarryingItem", false);
+            audioManager.PlaySound("Umbrella_Down");
             umbrella.SetActive(false);
+        }
+        
+        if (!umbrellaUp)
+        {
+            audioManager.PlaySound("Umbrella_Up");
+            umbrellaUp = true;
         }
 
     }
@@ -115,7 +149,14 @@ public class PlayerHandler : MonoBehaviour
         {
             isUsingUmbrella = false;
         }
+        anim.SetBool("isCarryingItem", false);
         umbrella.SetActive(false);
+
+        if (umbrellaUp)
+        {
+            umbrellaUp = false;
+            audioManager.PlaySound("Umbrella_Down");
+        }
     }
 
     public void StartExtinguisher ()
@@ -126,6 +167,7 @@ public class PlayerHandler : MonoBehaviour
         {
             extinguisherFuel -= 1.5f;
             extinguisherBar.SetSliderValue(extinguisherFuel);
+            anim.SetBool("isCarryingItem", true);
             extinguisherSmoke.SetActive(true);
             // Debug.Log(extinguisherFuel);
         }
@@ -141,7 +183,13 @@ public class PlayerHandler : MonoBehaviour
         {
             isUsingExtinguisher = false;
         }
+        anim.SetBool("isCarryingItem", false);
         extinguisherSmoke.SetActive(false);
+    }
+
+    public void StopRepairingItem ()
+    {
+        isRepairingItem = false;
     }
 
     void DamagePlayer (float damage)
@@ -152,7 +200,14 @@ public class PlayerHandler : MonoBehaviour
 
     void DiePlayer ()
     {
-        Destroy(this.gameObject);
+        if (!isDead)
+        {
+            audioManager.PlaySound("NPC_Death");
+            timeController.EndGame();
+            gameObject.GetComponent<SpriteRenderer>().enabled = false;
+            isDead = true;
+        }
+        
     }
 
     void OnTriggerEnter2D (Collider2D col)
@@ -177,6 +232,8 @@ public class PlayerHandler : MonoBehaviour
             isPickingExtinguisher = true;
             // Debug.Log("After:" + extinguisherFuel);
         }
+
+        
     }
 
     void OnTriggerStay2D (Collider2D col)
@@ -192,8 +249,28 @@ public class PlayerHandler : MonoBehaviour
                 {
                     col.gameObject.GetComponent<FireController>().DescreaseFire(10f);
                 }
+                else if (thing.gameObject.layer.Equals(9)) // If it's the player
+                {
+                    // Debug.Log("Here!");
+                    DamagePlayer(0.05f);
+                }
                 // Debug.Log("Object: " + thing.gameObject.name);
             }
         }
+
+        if (col.gameObject.layer.Equals(17)) // Repairable layer
+        {
+            // Repair Handler
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                BreakableController bkc = col.gameObject.GetComponent<BreakableController>();
+                if (bkc.GetBroken())
+                {
+                    bkc.Repair();
+                    isRepairingItem = false;
+                }
+            }
+        }
+        
     }
 }

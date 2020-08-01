@@ -36,7 +36,7 @@ public class RockSpawner : MonoBehaviour
 
     IEnumerator SpawnTimer (float spawnTime)
     {
-        Debug.Log("Attempting Spawn!");
+        // Debug.Log("Attempting Spawn!");
         Vector3 spawnPosition = new Vector3(Random.Range(min_x, max_x), gameObject.transform.position.y, gameObject.transform.position.z);
         Instantiate(rock, spawnPosition, Quaternion.identity);
         yield return new WaitForSeconds(spawnTime);

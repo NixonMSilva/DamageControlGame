@@ -19,6 +19,9 @@ public class CharacterController2D : MonoBehaviour
 	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 	private Vector3 m_Velocity = Vector3.zero;
 
+	public Animator anim;
+	private float currSpeed;
+
 	[Header("Events")]
 	[Space]
 
@@ -32,6 +35,8 @@ public class CharacterController2D : MonoBehaviour
 
 	private void Awake ()
 	{
+		currSpeed = 0;
+
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
 		if (OnLandEvent == null)
@@ -105,7 +110,10 @@ public class CharacterController2D : MonoBehaviour
 				}
 			}
 
-			
+			// Animates accordingly
+			currSpeed = Mathf.Abs(move);
+			anim.SetFloat("speed", currSpeed);
+
 			// Move the character by finding the target velocity
 			Vector3 targetVelocity = new Vector2(move * 10f, m_Rigidbody2D.velocity.y);
 			// And then smoothing it out and applying it to the character

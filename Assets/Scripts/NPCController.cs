@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NPCController : MonoBehaviour
@@ -21,9 +22,15 @@ public class NPCController : MonoBehaviour
     public Rigidbody2D rb;
     public BoxCollider2D bc;
 
+    public GameObject audioManagerObject;
+    AudioManager audioManager;
+
+    public LayerMask fireMask;
+
     private bool onGround = false;
 
     private bool hasLeftMap = false;
+    private bool hasDied = false;
     
     private void Awake ()
     {
@@ -32,37 +39,40 @@ public class NPCController : MonoBehaviour
         {
             scoreController = scoreObject.GetComponent<ScoreController>();
         }
-        Debug.Log(scoreObject.ToString());
         health = maxHealth;
+        audioManagerObject = GameObject.Find("AudioManager");
+        audioManager = audioManagerObject.GetComponent<AudioManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         // If the NPC's health reaches 0, then he dies
         if (health <= 0f)
         {
             Die();
         }
-        
-        // While not trapped, seek exit
-        if (!isTrapped)
-        {
-            SeekExit();
-        }
+
+        SeekExit();
     }
 
     void SeekExit ()
     {
-        if (isTrapped && onGround)
+        if (onGround)
         {
-            // Debug.Log(this.gameObject.name + "Seeking exit");
-            Vector2 exitSeekingTranslation = nearestExist.transform.position - gameObject.transform.position;
-            mc.PerformMoveNormalized(rb, exitSeekingTranslation, Defines.DEFAULTSPEED * 0.1f);
+            // Check if there's a fire in front of him before the exit
+            CheckForFires();
+
+            if (!isTrapped)
+            {
+                Vector2 exitSeekingTranslation = nearestExist.transform.position - gameObject.transform.position;
+                mc.PerformMoveNormalized(rb, exitSeekingTranslation, Defines.DEFAULTSPEED * 0.1f);
+            }
+            
         }
         else
         {
-            // Debug.Log("Not seeking exit");
             onGround = IsGrounded();
         }
     }
@@ -70,12 +80,12 @@ public class NPCController : MonoBehaviour
     bool IsGrounded ()
     {
         RaycastHit2D hit = Physics2D.Raycast(bc.bounds.center, Vector2.down, bc.bounds.extents.y + 0.2f, groundMask);
-        // Debug.Log(hit.collider != null);
         return (hit.collider != null);
     }
 
     void Die ()
     {
+        
         Destroy(this.gameObject);
     }
 
@@ -83,7 +93,8 @@ public class NPCController : MonoBehaviour
     {
         if (!hasLeftMap)
         {
-            scoreController.AddToScore(100);
+            audioManager.PlaySound("NPC_Escape");
+            scoreController.AddToScore(gameObject.transform.position, 100);
             hasLeftMap = true;
         }
         Destroy(this.gameObject, 0.25f);
@@ -91,22 +102,55 @@ public class NPCController : MonoBehaviour
 
     void DealDamage (float damage)
     {
+        if (!hasDied)
+        {
+            scoreController.AddToScore(gameObject.transform.position , - 250);
+            audioManager.PlaySound("NPC_Death");
+            hasDied = true;
+        }
         health -= damage;
+    }
+
+    void CheckForFires ()
+    {
+        if(nearestExist != null)
+        {
+            // Debug.DrawRay(gameObject.transform.position, nearestExist.transform.position - gameObject.transform.position, Color.magenta);
+            RaycastHit2D rc = Physics2D.Raycast(gameObject.transform.position, nearestExist.transform.position - gameObject.transform.position, 2f, fireMask);
+            if (rc)
+            {
+                if (Vector3.Distance(gameObject.transform.position, nearestExist.transform.position) > Vector3.Distance(gameObject.transform.position, rc.collider.transform.position))
+                    isTrapped = true;
+                else
+                    isTrapped = false;
+            }
+            else
+            {
+                isTrapped = false;
+            }
+        }
     }
 
     void OnTriggerEnter2D (Collider2D col)
     {
-        // Debug.Log(col.name);
         if (col.gameObject.Equals(nearestExist))
         {
-            // Debug.Log("We're here!");
             ExitMap();
         }
         else if (col.gameObject.layer.Equals(12)) // Rock layer
         {
-            // Debug.Log("rock!");
             DealDamage(50f);
         }
         
+    }
+
+    public void SetExit ()
+    {
+        List<GameObject> possibleExits = GameObject.FindGameObjectsWithTag("Exit").ToList();
+        int chosenExit = UnityEngine.Random.Range(0, possibleExits.Count);
+        if (possibleExits[chosenExit] != null)
+            nearestExist = possibleExits[chosenExit];
+        else
+            Debug.Log("Houston, we have a problem");
     }
 }

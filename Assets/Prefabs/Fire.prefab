@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5512644562248867188}
   - component: {fileID: 5512644562248867191}
   - component: {fileID: 5512644562248867186}
+  - component: {fileID: 5232723954679244224}
   m_Layer: 15
   m_Name: Fire
   m_TagString: Untagged
@@ -72,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 33e67e45dc0d7e144875b03541c324be, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dea2168c3aa7fdd4ebc24c983094ca6e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -123,3 +124,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.77760684, y: 0.8950275}
   m_EdgeRadius: 0
+--- !u!95 &5232723954679244224
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5512644562248867190}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c13966920bc24f242b9cbee455cfef56, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
